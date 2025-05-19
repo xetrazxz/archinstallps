@@ -1,1 +1,0 @@
-sudo pacman -S mesa vulkan-radeon lib32-mesa lib32-vulkan-radeon
