@@ -90,14 +90,6 @@ systemctl enable dhcpcd
 systemctl enable iwd
 EOF
 
-echo "ZRAM Setup"
-
-arch-chroot /mnt /bin/bash <<EOF
-pacman -Sy zram-generator --noconfirm
-echo "[zram0]" > /etc/systemd/zram-generator.conf
-echo "zram-size = ram" >> etc/systemd/zram-generator.conf
-echo "compression-algorithm = zstd" >> etc/systemd/zram-generator.conf
-EOF
 echo "Installation complete! You can now reboot."
 umount -R /mnt
 umount -R /mnt
