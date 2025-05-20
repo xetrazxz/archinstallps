@@ -23,6 +23,8 @@ lsblk /dev/sda
 echo "Formatting EFI and root partitions..."
 mkfs.fat -F32 -n boot /dev/sda1
 mkfs.btrfs -f -L archlinux /dev/sda2
+#mkfs.btrfs -f -L gentoo /dev/sda3
+#yes | mkfs.ext4 -L drive /dev/sda4
 
 echo "Creating Btrfs subvolumes..."
 mount /dev/sda2 /mnt
