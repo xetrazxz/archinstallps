@@ -3,8 +3,15 @@ set -e
 
 echo "Starting full Arch install..."
 
+# Ask for passwords securely
+echo "Enter password for root user:"
+read -s ROOT_PASS
+echo "Enter password for user 'xetra':"
+read -s USER_PASS
+
 # 0 - Partition disk (no labels)
 echo "Partitioning disk..."
+# Uncomment the next lines if you want to repartition
 #sgdisk -Z /dev/sda
 #sgdisk -n1:0:+1G   -t1:ef00 /dev/sda
 #sgdisk -n2:0:+128G -t2:8300 /dev/sda
@@ -16,8 +23,6 @@ lsblk /dev/sda
 echo "Formatting EFI and root partitions..."
 mkfs.fat -F32 -n boot /dev/sda1
 mkfs.btrfs -f -L archlinux /dev/sda2
-#mkfs.btrfs -f -L gentoo /dev/sda3
-#yes | mkfs.ext4 -L drive /dev/sda4
 
 echo "Creating Btrfs subvolumes..."
 mount /dev/sda2 /mnt
@@ -65,10 +70,11 @@ echo "127.0.0.1   localhost" > /etc/hosts
 echo "::1         localhost" >> /etc/hosts
 echo "127.0.1.1   archlinux.localdomain archlinux" >> /etc/hosts
 
-echo root:root | chpasswd
-
 echo -e "KEYMAP=us\nFONT=lat9w-16" > /etc/vconsole.conf
 EOF
+
+# Set root password
+arch-chroot /mnt /bin/bash -c "echo 'root:$ROOT_PASS' | chpasswd"
 
 # 5 - Install and configure bootloader
 echo "Installing GRUB bootloader..."
@@ -79,18 +85,11 @@ EOF
 
 # 6 - Create user and enable network services
 echo "Creating user and enabling network..."
-arch-chroot /mnt /bin/bash <<EOF
-useradd -m -G wheel xetra
-echo xetra:dark | chpasswd
+arch-chroot /mnt /bin/bash -c "useradd -m -G wheel xetra && echo 'xetra:$USER_PASS' | chpasswd"
+arch-chroot /mnt /bin/bash -c "echo '%wheel ALL=(ALL:ALL) ALL' >> /etc/sudoers"
+arch-chroot /mnt /bin/bash -c "pacman -Sy --noconfirm dhcpcd iwd && systemctl enable dhcpcd && systemctl enable iwd"
 
-echo "%wheel ALL=(ALL:ALL) ALL" >> /etc/sudoers
-
-pacman -Sy --noconfirm dhcpcd iwd
-systemctl enable dhcpcd
-systemctl enable iwd
-EOF
-
+# Finish
 echo "Installation complete! You can now reboot."
-umount -R /mnt
 umount -R /mnt
 reboot
