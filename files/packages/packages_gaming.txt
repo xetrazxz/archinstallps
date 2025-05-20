@@ -1,0 +1,6 @@
+wine
+winetricks
+wine-mono
+gamemode
+gamescope
+lutris
