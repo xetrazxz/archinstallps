@@ -30,19 +30,25 @@ echo "Creating Btrfs subvolumes..."
 mount /dev/sda2 /mnt
 btrfs subvolume create /mnt/@
 btrfs subvolume create /mnt/@home
+btrfs subvolume create /mnt/@root
 btrfs subvolume create /mnt/@snapshots
+btrfs subvolume create /mnt/@srv
 btrfs subvolume create /mnt/@var-cache
 btrfs subvolume create /mnt/@var-log
+btrfs subvolume create /mnt/@var-tmp
 umount /mnt
 
 echo "Mounting subvolumes..."
 mount -o noatime,compress=lzo,subvol=@ /dev/sda2 /mnt
-mkdir -p /mnt/{efi,home,root,.snapshots,var/cache,var/log}
+mkdir -p /mnt/{efi,home,root,.snapshots,srv,var/cache,var/log,var/tmp}
 
 mount -o noatime,compress=lzo,subvol=@home /dev/sda2 /mnt/home
+mount -o noatime,compress=lzo,subvol=@root /dev/sda2 /mnt/root
 mount -o noatime,compress=lzo,subvol=@snapshots /dev/sda2 /mnt/.snapshots
+mount -o noatime,compress=lzo,subvol=@srv /dev/sda2 /mnt/srv
 mount -o noatime,compress=lzo,subvol=@var-cache /dev/sda2 /mnt/var/cache
 mount -o noatime,compress=lzo,subvol=@var-log /dev/sda2 /mnt/var/log
+mount -o noatime,compress=lzo,subvol=@var-tmp /dev/sda2 /mnt/var/tmp
 
 mount /dev/sda1 /mnt/efi
 
