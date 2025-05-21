@@ -16,7 +16,8 @@ echo "Partitioning disk..."
 #sgdisk -n1:0:+1G   -t1:ef00 /dev/sda
 #sgdisk -n2:0:+128G -t2:8300 /dev/sda
 #sgdisk -n3:0:+64G  -t3:8300 /dev/sda
-#sgdisk -n4:0:0     -t4:8300 /dev/sda
+#sgdisk -n4:0:+8G   -t4:8200 /dev/sda
+#sgdisk -n5:0:0     -t4:8300 /dev/sda
 lsblk /dev/sda
 
 # 1 - Format and mount partitions, create subvolumes
@@ -24,7 +25,8 @@ echo "Formatting EFI and root partitions..."
 mkfs.fat -F32 -n boot /dev/sda1
 mkfs.btrfs -f -L archlinux /dev/sda2
 #mkfs.btrfs -f -L gentoo /dev/sda3
-#yes | mkfs.ext4 -L drive /dev/sda4
+mkswap -L swapx /dev/sda4
+#yes | mkfs.ext4 -L drive /dev/sda5
 
 echo "Creating Btrfs subvolumes..."
 mount /dev/sda2 /mnt
@@ -42,8 +44,8 @@ echo "Mounting subvolumes..."
 mount -o noatime,autodefrag,compress=lzo,subvol=@ /dev/sda2 /mnt
 mkdir -p /mnt/{efi,home,root,.snapshots,srv,var/cache,var/log,var/tmp}
 
-mount -o noatime,autodefrag,compress=lzo,subvol=@home /dev/sda2 /mnt/home
-mount -o noatime,autodefrag,compress=lzo,subvol=@root /dev/sda2 /mnt/root
+mount -o noatime,compress=lzo,subvol=@home /dev/sda2 /mnt/home
+mount -o noatime,compress=lzo,subvol=@root /dev/sda2 /mnt/root
 mount -o noatime,compress=lzo,subvol=@snapshots /dev/sda2 /mnt/.snapshots
 mount -o noatime,compress=lzo,subvol=@srv /dev/sda2 /mnt/srv
 mount -o noatime,compress=lzo,subvol=@var-cache /dev/sda2 /mnt/var/cache
@@ -51,6 +53,8 @@ mount -o noatime,compress=lzo,subvol=@var-log /dev/sda2 /mnt/var/log
 mount -o noatime,compress=lzo,subvol=@var-tmp /dev/sda2 /mnt/var/tmp
 
 mount /dev/sda1 /mnt/efi
+
+swapon /dev/sda4
 
 # 2 - Install base system
 echo "Installing base system..."
