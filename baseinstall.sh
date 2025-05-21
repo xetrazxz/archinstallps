@@ -39,11 +39,11 @@ btrfs subvolume create /mnt/@var-tmp
 umount /mnt
 
 echo "Mounting subvolumes..."
-mount -o noatime,compress=lzo,subvol=@ /dev/sda2 /mnt
+mount -o noatime,autodefrag,compress=lzo,subvol=@ /dev/sda2 /mnt
 mkdir -p /mnt/{efi,home,root,.snapshots,srv,var/cache,var/log,var/tmp}
 
-mount -o noatime,compress=lzo,subvol=@home /dev/sda2 /mnt/home
-mount -o noatime,compress=lzo,subvol=@root /dev/sda2 /mnt/root
+mount -o noatime,autodefrag,compress=lzo,subvol=@home /dev/sda2 /mnt/home
+mount -o noatime,autodefrag,compress=lzo,subvol=@root /dev/sda2 /mnt/root
 mount -o noatime,compress=lzo,subvol=@snapshots /dev/sda2 /mnt/.snapshots
 mount -o noatime,compress=lzo,subvol=@srv /dev/sda2 /mnt/srv
 mount -o noatime,compress=lzo,subvol=@var-cache /dev/sda2 /mnt/var/cache
